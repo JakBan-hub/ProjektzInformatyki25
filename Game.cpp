@@ -15,10 +15,6 @@ public:
         text.setPosition(x, y);
     }
 
-
-
-
-
     void setText(const std::string& value)
     {
         text.setString(value);
@@ -110,7 +106,7 @@ public:
         {
             int bulletX = static_cast<int>(sprite.getPosition().x + sprite.getGlobalBounds().width / 2 - 2.5f);
             int bulletY = static_cast<int>(sprite.getPosition().y);
-            bullets.emplace_back(bulletX, bulletY, -10, sf::Color::Green); 
+            bullets.emplace_back(bulletX, bulletY, -10, sf::Color::Green);
             clock.restart();
         }
     }
@@ -163,7 +159,7 @@ private:
     sf::Sprite sprite;
     sf::Texture texture;
     std::vector<Bullet> bullets;
-    int lives = 3000;
+    int lives = 10;
 };
 
 class Enemy
@@ -222,6 +218,14 @@ public:
             window.draw(circleShape);
     }
 
+    void move(float dx, float dy)
+    {
+        if (shapeType == 1)
+            rectangleShape.move(dx, dy);
+        else
+            circleShape.move(dx, dy);
+    }
+
     Bullet shoot() const
     {
         float x = getBounds().left + getBounds().width / 2 - 2.5f;
@@ -233,22 +237,22 @@ public:
     {
         switch (shapeType)
         {
-        case 1:
-            return 1.5f + static_cast<float>(rand() % 50) / 100.0f; 
-        case 2:
-            return 1.0f + static_cast<float>(rand() % 50) / 100.0f; 
-        case 3:
-            return 0.75f + static_cast<float>(rand() % 25) / 100.0f; 
-        default:
-            return 1.0f;
+        case 1: 
+            return 5.0f + static_cast<float>(rand() % 200) / 100.0f; 
+        case 2: 
+            return 4.0f + static_cast<float>(rand() % 100) / 100.0f; 
+        case 3: 
+            return 3.0f + static_cast<float>(rand() % 100) / 100.0f; 
+
         }
     }
+
 
 private:
     int type;
     int health;
     int score;
-    int shapeType; 
+    int shapeType;
     sf::RectangleShape rectangleShape;
     sf::CircleShape circleShape;
 
@@ -264,6 +268,119 @@ private:
     }
 };
 
+void setupLevel(int level, std::vector<Enemy>& enemies)
+{
+    enemies.clear();
+
+    switch (level)
+    {
+    case 1: 
+        for (int i = 0; i < 9; ++i)
+        {
+            enemies.emplace_back(1, 50 + i * 70, 100);
+        }
+        for (int i = 0; i < 4; ++i)
+        {
+            enemies.emplace_back(1, 50 + i * 70, 175);
+        }
+        enemies.emplace_back(2, 50+4*70, 175);
+        for (int i = 5; i < 9; ++i)
+        {
+            enemies.emplace_back(1, 50+ i * 70, 175);
+        }
+        for (int i = 0; i < 9; ++i)
+        {
+            enemies.emplace_back(1, 50 + i * 70, 250);
+        }
+        
+        break;
+
+    case 2: 
+        for (int i = 0; i < 10; ++i)
+        {
+            enemies.emplace_back(1, 50 + i * 70, 50);
+            enemies.emplace_back(1, 50 + i * 70, 200);
+        }
+
+        
+        for (int i = 0; i < 10; ++i)
+        {
+            if (i % 2 == 0) {
+                enemies.emplace_back(1, 50 + i * 70, 100);
+                enemies.emplace_back(2, 50 + i * 70, 150);
+            }
+            else
+            {
+                enemies.emplace_back(2, 50 + i * 70, 100);
+                enemies.emplace_back(1, 50 + i * 70, 150);
+            }   
+        }
+        break;
+
+    case 3: 
+        for (int i = 0; i < 9; ++i)
+        {
+            enemies.emplace_back(2, 50 + i * 70, 100);
+        }
+        for (int i = 0; i < 4; ++i)
+        {
+            enemies.emplace_back(1, 50 + i * 70, 175);
+        }
+        enemies.emplace_back(3, 50 + 4 * 70, 175);
+        for (int i = 5; i < 9; ++i)
+        {
+            enemies.emplace_back(2, 50 + i * 70, 175);
+        }
+        for (int i = 0; i < 9; ++i)
+        {
+            enemies.emplace_back(1, 50 + i * 70, 250);
+        }
+
+        break;
+
+    case 4:
+        for (int i = 0; i < 6; ++i)
+        {
+            enemies.emplace_back(3, 50 + i * 135, 100);
+        }
+
+        for (int i = 0; i < 8; ++i)
+        {
+            enemies.emplace_back(1, 75 + i * 86, 200);
+        }
+        for (int i = 0; i < 3; ++i)
+        {
+            enemies.emplace_back(2, 125 + i * 250, 300);
+        }
+        break;
+        
+    case 5: 
+        int changeY = -132;
+        int changeY2 = -65;
+        enemies.emplace_back(3, 400 + 45, 150 + changeY);
+        enemies.emplace_back(3, 400 + 45, 200 + changeY);
+        enemies.emplace_back(3, 400 + 45, 250 + changeY);
+        enemies.emplace_back(3, 450 + 45, 200 + changeY);
+        enemies.emplace_back(3, 350 + 45, 200 + changeY);
+        enemies.emplace_back(2, 350 + 45, 250 + changeY);
+        enemies.emplace_back(2, 450 + 45, 250 + changeY);
+        enemies.emplace_back(2, 350 + 45, 150 + changeY);
+        enemies.emplace_back(2, 450 + 45, 150 + changeY);
+
+
+        enemies.emplace_back(3, 200 - 100, 150 + changeY2);
+        enemies.emplace_back(3, 200 - 100, 200 + changeY2);
+        enemies.emplace_back(3, 200 - 100, 250 + changeY2);
+        enemies.emplace_back(3, 250 - 100, 200 + changeY2);
+        enemies.emplace_back(3, 150 - 100, 200 + changeY2);
+        enemies.emplace_back(2, 150 - 100, 250 + changeY2);
+        enemies.emplace_back(2, 250 - 100, 250 + changeY2);
+        enemies.emplace_back(2, 150 - 100, 150 + changeY2);
+        enemies.emplace_back(2, 250 - 100, 150 + changeY2);
+        break;
+    }
+}
+
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(800, 600), "The best game ever!");
@@ -275,23 +392,26 @@ int main()
     Player player;
     TextDisplay scoreDisplay(font, 24, sf::Color::White, 10, 10);
     TextDisplay livesDisplay(font, 24, sf::Color::White, 10, 40);
+    TextDisplay levelDisplay(font, 24, sf::Color::White, 10, 70);
 
     int speed = 5;
     sf::Clock clock;
-    sf::Time shootDelay = sf::seconds(0.1f);
+    sf::Time shootDelay = sf::seconds(0.3f);
 
     std::vector<Enemy> enemies;
     std::vector<Bullet> enemyBullets;
-    std::vector<sf::Clock> enemyShootClocks; 
+    std::vector<sf::Clock> enemyShootClocks;
     int score = 0;
+    int level = 1;
 
-    enemies.emplace_back(1, 100, 100);
-    enemies.emplace_back(2, 300, 150);
-    enemies.emplace_back(3, 500, 200);
+    bool moveRight = true;
+    float enemySpeed = 0.09f;
+
+    setupLevel(level, enemies);
 
     for (size_t i = 0; i < enemies.size(); ++i)
     {
-        enemyShootClocks.emplace_back(); 
+        enemyShootClocks.emplace_back();
     }
 
     while (window.isOpen())
@@ -306,6 +426,31 @@ int main()
         player.handleInput(speed, window);
         player.shoot(clock, shootDelay);
         player.updateBullets();
+
+        // Move enemies left and right
+        float moveDistance;
+        if (moveRight)
+        {
+            moveDistance = enemySpeed;
+        }
+        else
+        {
+            moveDistance = -enemySpeed;
+        }
+
+        bool changeDirection = false;
+        for (auto& enemy : enemies)
+        {
+            enemy.move(moveDistance, 0);
+            if (enemy.getBounds().left <= 0 || enemy.getBounds().left + enemy.getBounds().width >= window.getSize().x)
+            {
+                changeDirection = true;
+            }
+        }
+        if (changeDirection)
+        {
+            moveRight = !moveRight;
+        }
 
         for (size_t i = 0; i < enemies.size(); ++i)
         {
@@ -358,8 +503,24 @@ int main()
             }
         }
 
+        if (enemies.empty())
+        {
+            level++;
+            if (level > 5)
+            {
+                window.close();
+            }
+            setupLevel(level, enemies);
+            enemyShootClocks.clear();
+            for (size_t i = 0; i < enemies.size(); ++i)
+            {
+                enemyShootClocks.emplace_back();
+            }
+        }
+
         scoreDisplay.setText("Score: " + std::to_string(score));
         livesDisplay.setText("Lives: " + std::to_string(player.getLives()));
+        levelDisplay.setText("Level: " + std::to_string(level));
 
         window.clear();
         player.draw(window);
@@ -373,6 +534,7 @@ int main()
         }
         scoreDisplay.draw(window);
         livesDisplay.draw(window);
+        levelDisplay.draw(window);
         window.display();
 
         if (player.getLives() <= 0)
