@@ -4,6 +4,61 @@
 #include <ctime>
 #include <string>
 
+class Pause
+{
+public:
+
+    Pause(const std::string& texturePath)
+    {
+        pauseTexture.loadFromFile(texturePath);
+        pauseSprite.setTexture(pauseTexture);
+
+    }
+
+
+    void handleEvent(const sf::Event& event, sf::RenderWindow& window, bool showHelp)
+    {
+        if (showHelp)
+        {
+            return;
+        }
+
+        if (event.type == sf::Event::KeyPressed)
+        {
+            if (event.key.code == sf::Keyboard::Escape)
+            {
+                if (!paused)
+                    paused = true;     
+                else
+                    window.close();    
+            }
+            else if (event.key.code == sf::Keyboard::Enter)
+            {
+                if (paused)
+                    paused = false;    
+            }
+        }
+    }
+
+
+    void draw(sf::RenderWindow& window)
+    {
+        window.clear();
+        window.draw(pauseSprite);
+        window.display();
+    }
+
+    bool isPaused() const
+    {
+        return paused;
+    }
+
+private:
+    sf::Texture pauseTexture;
+    sf::Sprite  pauseSprite;
+    bool paused = false;
+};
+
 class TextDisplay
 {
 public:
@@ -24,7 +79,6 @@ public:
     {
         window.draw(text);
     }
-
 private:
     sf::Text text;
 };
@@ -237,12 +291,12 @@ public:
     {
         switch (shapeType)
         {
-        case 1: 
-            return 5.0f + static_cast<float>(rand() % 200) / 100.0f; 
-        case 2: 
-            return 4.0f + static_cast<float>(rand() % 100) / 100.0f; 
-        case 3: 
-            return 3.0f + static_cast<float>(rand() % 100) / 100.0f; 
+        case 1:
+            return 5.0f + static_cast<float>(rand() % 200) / 100.0f;
+        case 2:
+            return 4.0f + static_cast<float>(rand() % 100) / 100.0f;
+        case 3:
+            return 3.0f + static_cast<float>(rand() % 100) / 100.0f;
 
         }
     }
@@ -274,7 +328,7 @@ void setupLevel(int level, std::vector<Enemy>& enemies)
 
     switch (level)
     {
-    case 1: 
+    case 1:
         for (int i = 0; i < 9; ++i)
         {
             enemies.emplace_back(1, 50 + i * 70, 100);
@@ -283,26 +337,26 @@ void setupLevel(int level, std::vector<Enemy>& enemies)
         {
             enemies.emplace_back(1, 50 + i * 70, 175);
         }
-        enemies.emplace_back(2, 50+4*70, 175);
+        enemies.emplace_back(2, 50 + 4 * 70, 175);
         for (int i = 5; i < 9; ++i)
         {
-            enemies.emplace_back(1, 50+ i * 70, 175);
+            enemies.emplace_back(1, 50 + i * 70, 175);
         }
         for (int i = 0; i < 9; ++i)
         {
             enemies.emplace_back(1, 50 + i * 70, 250);
         }
-        
+
         break;
 
-    case 2: 
+    case 2:
         for (int i = 0; i < 10; ++i)
         {
             enemies.emplace_back(1, 50 + i * 70, 50);
             enemies.emplace_back(1, 50 + i * 70, 200);
         }
 
-        
+
         for (int i = 0; i < 10; ++i)
         {
             if (i % 2 == 0) {
@@ -313,11 +367,11 @@ void setupLevel(int level, std::vector<Enemy>& enemies)
             {
                 enemies.emplace_back(2, 50 + i * 70, 100);
                 enemies.emplace_back(1, 50 + i * 70, 150);
-            }   
+            }
         }
         break;
 
-    case 3: 
+    case 3:
         for (int i = 0; i < 9; ++i)
         {
             enemies.emplace_back(2, 50 + i * 70, 100);
@@ -353,8 +407,8 @@ void setupLevel(int level, std::vector<Enemy>& enemies)
             enemies.emplace_back(2, 125 + i * 250, 300);
         }
         break;
-        
-    case 5: 
+
+    case 5:
         int changeY = -132;
         int changeY2 = -65;
         enemies.emplace_back(3, 400 + 45, 150 + changeY);
@@ -389,6 +443,13 @@ int main()
     sf::Font font;
     font.loadFromFile("arial.ttf");
 
+    sf::Texture helpTexture;
+    if (!helpTexture.loadFromFile("help.png")) {
+        return -1;
+    }
+    sf::Sprite helpSprite(helpTexture);
+    Pause pause("esc.png");
+
     Player player;
     TextDisplay scoreDisplay(font, 24, sf::Color::White, 10, 10);
     TextDisplay livesDisplay(font, 24, sf::Color::White, 10, 40);
@@ -407,6 +468,8 @@ int main()
     bool moveRight = true;
     float enemySpeed = 0.09f;
 
+    bool showHelp = false;
+
     setupLevel(level, enemies);
 
     for (size_t i = 0; i < enemies.size(); ++i)
@@ -419,15 +482,42 @@ int main()
         sf::Event event;
         while (window.pollEvent(event))
         {
+            
             if (event.type == sf::Event::Closed)
+            {
                 window.close();
+            }
+
+
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F1)
+            {
+                if (!pause.isPaused())
+                {
+                    showHelp = !showHelp;
+                }
+            }
+
+
+            pause.handleEvent(event, window, showHelp);
+        }
+
+        if (showHelp)
+        {
+            window.clear();
+            window.draw(helpSprite);
+            window.display();
+            continue;
+        }
+        if (pause.isPaused())
+        {
+            pause.draw(window);
+            continue;
         }
 
         player.handleInput(speed, window);
         player.shoot(clock, shootDelay);
         player.updateBullets();
 
-        // Move enemies left and right
         float moveDistance;
         if (moveRight)
         {
@@ -520,6 +610,7 @@ int main()
 
         scoreDisplay.setText("Score: " + std::to_string(score));
         livesDisplay.setText("Lives: " + std::to_string(player.getLives()));
+
         levelDisplay.setText("Level: " + std::to_string(level));
 
         window.clear();
