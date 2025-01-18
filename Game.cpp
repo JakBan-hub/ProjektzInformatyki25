@@ -1,3 +1,10 @@
+//Autor: Jakub Banasik s200576
+//W grze sterujesz statkiem kosmicznym, eliminujesz wrogów i unikasz ich pocisków. 
+//Za pokonanych przeciwników zdobywasz punkty, a z ka¿dym kolejnym poziomem trudnoœæ wzrasta.
+//Gra koñczy siê, gdy stracisz wszystkie ¿ycia lub ukoñczysz wszystkie poziomy. Twoim celem jest zdobycie jak najwiêkszej liczby punktów i pobicie rekordu.
+
+
+
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <cstdlib>
