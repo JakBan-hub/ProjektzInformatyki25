@@ -4,11 +4,11 @@
 #include <ctime>
 #include <string>
 #include <fstream>
-
-void saveBestScore(int score , int lives) {
+#include <algorithm>
+void saveBestScore(int score , int hp) {
     std::ofstream file("best_score.txt", std::ios::trunc); 
     if (file.is_open()) {
-        file << score+lives*150;
+        file << score+hp*150;
         file.close();
     }
 }
@@ -54,7 +54,7 @@ public:
 
     }
 
-    void setScore(int points, int lives, bool isVictory, bool NewRecord) {
+    void setScore(int points, int hp, bool isVictory, bool NewRecord) {
         if (isVictory) {
             MainText.setString("Wygrales!");
             MainText.setFillColor(sf::Color::Green);
@@ -65,9 +65,9 @@ public:
             MainText.setFillColor(sf::Color::Red);
 
         }
-        int Score = points + lives * 150;
+        int Score = points + hp * 150;
         scoreText.setString("Twoje punkty: " + std::to_string(points) +
-            "\nPunkty za serca: " + std::to_string(lives * 150) +
+            "\nPunkty za serca: " + std::to_string(hp * 150) +
             "\nCalkowity wynik: " + std::to_string(Score));
 
         if (NewRecord==true) {
@@ -90,6 +90,7 @@ public:
         centerText(scoreText, 225);
         centerText(EnterText, 425);
         centerText(BestScore, 150);
+
         window.clear();
         window.draw(MainText);
         window.draw(scoreText);
@@ -107,44 +108,33 @@ private:
 class MENU
 {
 public:
-    MENU(const sf::Font& font, const std::string& backgroundPath = "background2.png")
+    MENU(const sf::Font& font, const std::string& backgroundPath = "background.png")
     {
         backgroundTexture.loadFromFile(backgroundPath);
         backgroundSprite.setTexture(backgroundTexture);
+
         TitleText.setFont(font);
         TitleText.setCharacterSize(65);
         TitleText.setFillColor(sf::Color::White);
         TitleText.setString("Space Geometry");
 
-
         StartText.setFont(font);
         StartText.setCharacterSize(42);
         StartText.setString("Start");
-
-
 
         ExitText.setFont(font);
         ExitText.setCharacterSize(42);
         ExitText.setString("Wyjdz");
         
-        
         Version.setFont(font);
         Version.setCharacterSize(23);
         Version.setFillColor(sf::Color::White);
-        Version.setString("Version:0.25");
+        Version.setString("Version:1.0");
         Version.setPosition(0, 568);
 
         BestScore.setFont(font);
         BestScore.setCharacterSize(30);
         BestScore.setFillColor(sf::Color::Yellow);
-
-
-        
-        
-
-
-
-
     }
 
     void ChooseOption(const sf::Event& event, bool& startGame, sf::RenderWindow& window)
@@ -224,7 +214,7 @@ public:
         pauseSprite.setTexture(pauseTexture);
     }
 
-    void handleEvent(const sf::Event& event, sf::RenderWindow& window, bool& isGameRunning) {
+    void Keyboard(const sf::Event& event, sf::RenderWindow& window, bool& isGameRunning) {
         if (event.type == sf::Event::KeyPressed) {
             if (event.key.code == sf::Keyboard::Enter) {
                 paused = false;
@@ -265,40 +255,51 @@ public:
         score.setFont(font);
         score.setCharacterSize(24);
         score.setFillColor(sf::Color::Red);
-        score.setPosition(230, 10);
+        score.setPosition(200, 10);
         score.setStyle(sf::Text::Bold);
 
-        lives.setFont(font);
-        lives.setCharacterSize(24);
-        lives.setFillColor(sf::Color::Red);
-        lives.setPosition(10, 10);
-        lives.setStyle(sf::Text::Bold);
+        hp.setFont(font);
+        hp.setCharacterSize(24);
+        hp.setFillColor(sf::Color::Red);
+        hp.setPosition(10, 10);
+        hp.setStyle(sf::Text::Bold);
 
         level.setFont(font);
         level.setCharacterSize(24);
         level.setFillColor(sf::Color::Red);
-        level.setPosition(120, 10);
+        level.setPosition(90, 10);
         level.setStyle(sf::Text::Bold);
+
+
+        background.setFillColor(sf::Color::Black); 
+        background.setPosition(0, 0); 
+        background.setSize(sf::Vector2f(800, 50)); 
 
     }
 
 
-    void setText(int scores, int livess, int levels) {
+    void setText(int scores, int hps, int levels) {
         score.setString("Score: " + std::to_string(scores));
-        lives.setString("Lives: " + std::to_string(livess));
+        hp.setString("Hp: " + std::to_string(hps));
         level.setString("Level: " + std::to_string(levels));
+        sf::FloatRect textBounds = score.getGlobalBounds();
+
+
     }
 
     void draw(sf::RenderWindow& window)
     {
+        window.draw(background);
         window.draw(score);
-        window.draw(lives);
+        window.draw(hp);
         window.draw(level);
     }
 private:
     sf::Text score;
-    sf::Text lives;
+    sf::Text hp;
     sf::Text level;
+    sf::RectangleShape background;
+
 };
 
 class Bullet
@@ -358,7 +359,7 @@ public:
         sprite.setPosition(375, 525);
     }
 
-    void handleInput(int speed, const sf::RenderWindow& window)
+    void Keyboard(int speed, const sf::RenderWindow& window)
     {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         {
@@ -419,19 +420,19 @@ public:
 
     void takeDamage()
     {
-        lives--;
+        hp--;
     }
 
-    int getLives() const
+    int gethp() const
     {
-        return lives;
+        return hp;
     }
 
 private:
     sf::Sprite sprite;
     sf::Texture texture;
     std::vector<Bullet> bullets;
-    int lives = 10;
+    int hp = 10;
 };
 
 class Enemy {
@@ -559,7 +560,7 @@ private:
     sf::RectangleShape square2;
     sf::CircleShape triangle1;
     sf::CircleShape triangle2;
-
+    // ustala hitboxy
     static sf::FloatRect AddingFigures(const sf::FloatRect& a, const sf::FloatRect& b) {
         float left = std::min(a.left, b.left);
         float top = std::min(a.top, b.top);
@@ -701,7 +702,7 @@ void setupLevel(int level, std::vector<Enemy>& enemies)
 
 int main() {
    
-    sf::RenderWindow window(sf::VideoMode(800, 600), "The best game ever!");
+    sf::RenderWindow window(sf::VideoMode(800, 600), "The best game ever!", sf::Style::Titlebar | sf::Style::Close);
     window.setFramerateLimit(60);
 
     sf::Font font;
@@ -736,7 +737,7 @@ int main() {
 
 
         sf::Texture backgroundTexture;
-        if (!backgroundTexture.loadFromFile("background2.png")) {
+        if (!backgroundTexture.loadFromFile("background.png")) {
             return -1;
         }
         sf::Sprite backgroundSprite(backgroundTexture);
@@ -749,19 +750,19 @@ int main() {
         int score = 0;
         int level = 1;
         bool gameOver = false;
-        bool isHelpActive = false;
+        bool isHelpActive = true;
         float enemySpeed = 0.12f;
         bool moveRight = true;
 
 
         sf::Clock clock;
-        sf::Time shootDelay = sf::seconds(0.05);
+        sf::Time shootDelay = sf::seconds(0.25);
         std::vector<Enemy> enemies;
         std::vector<Bullet> enemyBullets;
         std::vector<sf::Clock> enemyShootClocks;
 
         setupLevel(level, enemies);
-        for (size_t i = 0; i < enemies.size(); ++i) {
+        for (unsigned int i = 0; i < enemies.size(); ++i) {
             enemyShootClocks.emplace_back();
         }
 
@@ -776,7 +777,7 @@ int main() {
                     isHelpActive = !isHelpActive;
                 }
                 if (!isHelpActive) {
-                    pause.handleEvent(event, window, gameOver);
+                    pause.Keyboard(event, window, gameOver);
                 }
             }
 
@@ -795,7 +796,7 @@ int main() {
             }
 
 
-            player.handleInput(speed, window);
+            player.Keyboard(speed, window);
             player.shoot(clock, shootDelay);
             player.updateBullets();
 
@@ -815,7 +816,7 @@ int main() {
             }
 
             // Strzelanie wrogów
-            for (size_t i = 0; i < enemies.size(); ++i) {
+            for (unsigned int i = 0; i < enemies.size(); ++i) {
                 if (enemyShootClocks[i].getElapsedTime() > sf::seconds(enemies[i].getShootInterval())) {
                     enemyBullets.push_back(enemies[i].shoot());
                     enemyShootClocks[i].restart();
@@ -828,7 +829,7 @@ int main() {
                 if (bullet.getBounds().intersects(player.getBounds())) {
                     bullet.deactivate();
                     player.takeDamage();
-                    if (player.getLives() <= 0) {
+                    if (player.gethp() <= 0) {
                         gameOver = true;
                         break;
                     }
@@ -872,15 +873,15 @@ int main() {
                 }
                 setupLevel(level, enemies);
                 enemyShootClocks.clear();
-                for (size_t i = 0; i < enemies.size(); ++i) {
+                for (unsigned int i = 0; i < enemies.size(); ++i) {
                     enemyShootClocks.emplace_back();
                 }
             }
 
-           
             window.clear();
             window.draw(backgroundSprite);
             player.draw(window);
+            //Rysowanie przeciwnikow
             for (auto& enemy : enemies) {
                 enemy.draw(window);
             }
@@ -888,20 +889,20 @@ int main() {
                 bullet.draw(window);
             }
 
-            TextDisplay.setText(score, player.getLives(), level);
+            TextDisplay.setText(score, player.gethp(), level);
             TextDisplay.draw(window);
             window.display();
         }
 
         // Obs³uga koñca gry
         bool NewRecord = false;
-        if (player.getLives() <= 0 || level > 5) {
+        if (player.gethp() <= 0 || level > 5) {
             int BestScore = loadBestScore();
             if (score > BestScore) {
-                saveBestScore(score, player.getLives());
+                saveBestScore(score, player.gethp());
                 NewRecord = true;
             }
-            GameOverOrWin.setScore(score, player.getLives(), level > 5, NewRecord);
+            GameOverOrWin.setScore(score, player.gethp(), level > 5, NewRecord);
 
             bool returnToMenu = false;
             while (!returnToMenu) {
