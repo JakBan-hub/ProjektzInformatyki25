@@ -802,7 +802,7 @@ int main() {
                 continue;
             }
 
-
+            // Obsługa postaci
             player.Keyboard(speed, window);
             player.shoot(clock, shootDelay);
             player.updateBullets();
