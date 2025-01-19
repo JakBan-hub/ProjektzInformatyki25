@@ -1,7 +1,7 @@
 //Autor: Jakub Banasik s200576
-//W grze sterujesz statkiem kosmicznym, eliminujesz wrogów i unikasz ich pocisków. 
-//Za pokonanych przeciwników zdobywasz punkty, a z ka¿dym kolejnym poziomem trudnoœæ wzrasta.
-//Gra koñczy siê, gdy stracisz wszystkie ¿ycia lub ukoñczysz wszystkie poziomy. Twoim celem jest zdobycie jak najwiêkszej liczby punktów i pobicie rekordu.
+//W grze sterujesz statkiem kosmicznym, eliminujesz wrogÃ³w i unikasz ich pociskÃ³w. 
+//Za pokonanych przeciwnikÃ³w zdobywasz punkty, a z kaÂ¿dym kolejnym poziomem trudnoÅ“Ã¦ wzrasta.
+//Gra koÃ±czy siÃª, gdy stracisz wszystkie Â¿ycia lub ukoÃ±czysz wszystkie poziomy. Twoim celem jest zdobycie jak najwiÃªkszej liczby punktÃ³w i pobicie rekordu.
 
 
 
@@ -677,7 +677,7 @@ void setupLevel(int level, std::vector<Enemy>& enemies)
         break;
 
     case 5:
-        int changeY = -132;
+        int changeY = -20;
         int changeY2 = -65;
         enemies.emplace_back(3, 400 + 45, 150 + changeY);
         enemies.emplace_back(3, 400 + 45, 200 + changeY);
@@ -788,7 +788,7 @@ int main() {
                 }
             }
 
-            // Wyœwietlanie pomocy
+            // WyÅ“wietlanie pomocy
             if (isHelpActive) {
                 window.clear();
                 window.draw(helpSprite);
@@ -796,7 +796,7 @@ int main() {
                 continue;
             }
 
-            // Obs³uga pauzy
+            // ObsÂ³uga pauzy
             if (pause.isPaused()) {
                 pause.draw(window);
                 continue;
@@ -807,7 +807,7 @@ int main() {
             player.shoot(clock, shootDelay);
             player.updateBullets();
 
-            // Ruch wrogów
+            // Ruch wrogÃ³w
             float moveDistance = moveRight ? enemySpeed : -enemySpeed;
             bool changeDirection = false;
 
@@ -822,7 +822,7 @@ int main() {
                 moveRight = !moveRight;
             }
 
-            // Strzelanie wrogów
+            // Strzelanie wrogÃ³w
             for (unsigned int i = 0; i < enemies.size(); ++i) {
                 if (enemyShootClocks[i].getElapsedTime() > sf::seconds(enemies[i].getShootInterval())) {
                     enemyBullets.push_back(enemies[i].shoot());
@@ -830,7 +830,7 @@ int main() {
                 }
             }
 
-            // Kolizje pocisków z graczem
+            // Kolizje pociskÃ³w z graczem
             for (auto& bullet : enemyBullets) {
                 bullet.move();
                 if (bullet.getBounds().intersects(player.getBounds())) {
@@ -845,12 +845,12 @@ int main() {
 
             if (gameOver) break;
 
-            // Usuwanie nieaktywnych pocisków
+            // Usuwanie nieaktywnych pociskÃ³w
             enemyBullets.erase(std::remove_if(enemyBullets.begin(), enemyBullets.end(),
                 [&](const Bullet& bullet) { return bullet.isOffScreen(600) || !bullet.isActive(); }),
                 enemyBullets.end());
 
-            // Kolizje pocisków gracza z wrogami
+            // Kolizje pociskÃ³w gracza z wrogami
             for (auto& bullet : player.getBullets()) {
                 if (!bullet.isActive()) continue;
 
@@ -872,7 +872,7 @@ int main() {
                 }
             }
 
-            // Przejœcie do kolejnego poziomu
+            // PrzejÅ“cie do kolejnego poziomu
             if (enemies.empty()) {
                 level++;
                 if (level > 5) {
@@ -901,7 +901,7 @@ int main() {
             window.display();
         }
 
-        // Obs³uga koñca gry
+        // ObsÂ³uga koÃ±ca gry
         bool NewRecord = false;
         if (player.gethp() <= 0 || level > 5) {
             int BestScore = loadBestScore();
