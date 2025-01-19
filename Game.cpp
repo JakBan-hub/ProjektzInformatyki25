@@ -12,6 +12,7 @@
 #include <string>
 #include <fstream>
 #include <algorithm>
+//Nadpisuje najlepszy wynik
 void saveBestScore(int score , int hp) {
     std::ofstream file("best_score.txt", std::ios::trunc); 
     if (file.is_open()) {
@@ -19,6 +20,7 @@ void saveBestScore(int score , int hp) {
         file.close();
     }
 }
+// zwraca punkty z pliku .txt
 int loadBestScore() {
     std::ifstream file("best_score.txt");
     int bestScore = 0;
@@ -28,7 +30,7 @@ int loadBestScore() {
     }
     return bestScore;
 }
-
+//centruje tekst
 void centerText(sf::Text& text, int yPosition) {
     int windowWidth = 800; 
     sf::FloatRect bounds = text.getLocalBounds();
@@ -60,7 +62,7 @@ public:
         BestScore.setFillColor(sf::Color::White);
 
     }
-
+    // obsluguje wynik gry
     void setScore(int points, int hp, bool isVictory, bool NewRecord) {
         if (isVictory) {
             MainText.setString("Wygrales!");
@@ -143,7 +145,7 @@ public:
         BestScore.setCharacterSize(30);
         BestScore.setFillColor(sf::Color::Yellow);
     }
-
+    //wybor opcji
     void ChooseOption(const sf::Event& event, bool& startGame, sf::RenderWindow& window)
     {
         if (event.type == sf::Event::KeyPressed)
@@ -220,7 +222,7 @@ public:
         pauseTexture.loadFromFile(texturePath);
         pauseSprite.setTexture(pauseTexture);
     }
-
+    //wybor opcji
     void Keyboard(const sf::Event& event, sf::RenderWindow& window, bool& isGameRunning) {
         if (event.type == sf::Event::KeyPressed) {
             if (event.key.code == sf::Keyboard::Enter) {
@@ -284,7 +286,7 @@ public:
 
     }
 
-
+    //ustawianie informacji o zyciu, punktach i poziomie
     void setText(int scores, int hps, int levels) {
         score.setString("Score: " + std::to_string(scores));
         hp.setString("Hp: " + std::to_string(hps));
@@ -319,27 +321,27 @@ public:
         shape.setFillColor(color);
         shape.setPosition(x, y);
     }
-
+    //ruch
     void move()
     {
         shape.move(0, speed);
     }
-
+    //zwraca czy jest poza ekranem
     bool isOffScreen(float windowHeight) const
     {
         return shape.getPosition().y + shape.getSize().y < 0 || shape.getPosition().y > windowHeight;
     }
-
+    // hitboxy
     sf::FloatRect getBounds() const
     {
         return shape.getGlobalBounds();
     }
-
+    //rysowanie
     void draw(sf::RenderWindow& window)
     {
         window.draw(shape);
     }
-
+   //zwraca czy jest aktywny pocisk
     bool isActive() const
     {
         return active;
@@ -365,7 +367,7 @@ public:
         sprite.setTexture(texture);
         sprite.setPosition(375, 525);
     }
-
+    //obs³uga klawiatury
     void Keyboard(int speed, const sf::RenderWindow& window)
     {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
@@ -379,7 +381,7 @@ public:
                 sprite.move(speed, 0);
         }
     }
-
+    //strza³y
     void shoot(sf::Clock& clock, sf::Time shootDelay)
     {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && clock.getElapsedTime() > shootDelay)
@@ -390,7 +392,7 @@ public:
             clock.restart();
         }
     }
-
+    //aktualizacja pocisków 
     void updateBullets()
     {
         for (auto& bullet : bullets)
@@ -446,6 +448,7 @@ class Enemy {
 public:
     Enemy(int type, float x, float y)
         : type(type), health(type), score(getScoreForType(type)) {
+        //wybieranie typu przeciwnika
         switch (type) {
         case 1:
             rectangleShape = sf::RectangleShape(sf::Vector2f(30, 30));
@@ -486,7 +489,7 @@ public:
             break;
         }
     }
-
+    //zwraca hitboxy
     sf::FloatRect getBounds() const {
         if (shapeType == 1)
             return rectangleShape.getGlobalBounds();
@@ -506,7 +509,7 @@ public:
         health--;
         return health <= 0;
     }
-
+   
     int getScore() const {
         return score;
     }
@@ -523,7 +526,7 @@ public:
             window.draw(triangle2);
         }
     }
-
+    //poruszanie sie przeciwnikow
     void move(float dx, float dy) {
         if (shapeType == 1)
             rectangleShape.move(dx, dy);
@@ -536,13 +539,13 @@ public:
             triangle2.move(dx, dy);
         }
     }
-
+    // strzelanie przeciwnikow
     Bullet shoot() const {
         float x = getBounds().left + getBounds().width / 2 - 2.5f;
         float y = getBounds().top + getBounds().height;
         return Bullet(static_cast<int>(x), static_cast<int>(y), 5);
     }
-
+    //opoznienia dla strzalow
     float getShootInterval() const {
         switch (shapeType) {
         case 1:
@@ -588,7 +591,7 @@ private:
     }
 };
 
-
+//ryoswanie poziomów
 void setupLevel(int level, std::vector<Enemy>& enemies)
 {
     enemies.clear();
@@ -677,7 +680,7 @@ void setupLevel(int level, std::vector<Enemy>& enemies)
         break;
 
     case 5:
-        int changeY = -132;
+        int changeY = -20;
         int changeY2 = -65;
         enemies.emplace_back(3, 400 + 45, 150 + changeY);
         enemies.emplace_back(3, 400 + 45, 200 + changeY);
@@ -721,16 +724,14 @@ int main() {
     MENU MENU(font);
     GameOverOrWin GameOverOrWin(font);
     sf::Texture helpTexture;
-    if (!helpTexture.loadFromFile("help.png")) {
-        return -1;
-    }
+    helpTexture.loadFromFile("help.png");
     sf::Sprite helpSprite(helpTexture);
 
 
     bool startGame = false;
-
+    // pêtla g³ówna
     while (window.isOpen()) {
-
+        // Obs³uga menu
         while (!startGame && window.isOpen()) {
             sf::Event event;
             while (window.pollEvent(event)) {
@@ -772,10 +773,11 @@ int main() {
         for (unsigned int i = 0; i < enemies.size(); ++i) {
             enemyShootClocks.emplace_back();
         }
-
+        //Pêtla gry 
         while (window.isOpen() && !gameOver) {
            
             sf::Event event;
+            // F1 i Pauzy
             while (window.pollEvent(event)) {
                 if (event.type == sf::Event::Closed) {
                     window.close();
@@ -784,7 +786,7 @@ int main() {
                     isHelpActive = !isHelpActive;
                 }
                 if (!isHelpActive) {
-                    pause.Keyboard(event, window, gameOver);
+                    pause.Keyboard(event, window, gameOver); // Pauza
                 }
             }
 
@@ -802,7 +804,7 @@ int main() {
                 continue;
             }
 
-
+            // Obs³uga postaci
             player.Keyboard(speed, window);
             player.shoot(clock, shootDelay);
             player.updateBullets();
@@ -879,6 +881,7 @@ int main() {
                     break;
                 }
                 setupLevel(level, enemies);
+                //tworzy zegar dla ka¿dego przeciwnika
                 enemyShootClocks.clear();
                 for (unsigned int i = 0; i < enemies.size(); ++i) {
                     enemyShootClocks.emplace_back();
@@ -892,10 +895,11 @@ int main() {
             for (auto& enemy : enemies) {
                 enemy.draw(window);
             }
+            //Rysowanie strza³ów 
             for (auto& bullet : enemyBullets) {
                 bullet.draw(window);
             }
-
+            // Wyœwietlanie tesktu
             TextDisplay.setText(score, player.gethp(), level);
             TextDisplay.draw(window);
             window.display();
