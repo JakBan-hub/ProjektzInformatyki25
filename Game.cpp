@@ -1,7 +1,7 @@
 //Autor: Jakub Banasik s200576
-//W grze sterujesz statkiem kosmicznym, eliminujesz wrogów i unikasz ich pocisków. 
-//Za pokonanych przeciwników zdobywasz punkty, a z ka¿dym kolejnym poziomem trudnoœæ wzrasta.
-//Gra koñczy siê, gdy stracisz wszystkie ¿ycia lub ukoñczysz wszystkie poziomy. Twoim celem jest zdobycie jak najwiêkszej liczby punktów i pobicie rekordu.
+//W grze sterujesz statkiem kosmicznym, eliminujesz wrogów i unikasz ich pociskow. 
+//Za pokonanych przeciwników zdobywasz punkty, a z ka¿dym kolejnym poziomem trudnosc wzrasta.
+//Gra konczy sie, gdy stracisz wszystkie zycia lub ukoñczysz wszystkie poziomy. Twoim celem jest zdobycie jak najwiêkszej liczby punktów i pobicie rekordu.
 
 
 
@@ -341,12 +341,12 @@ public:
     {
         window.draw(shape);
     }
-   //zwraca czy jest aktywny pocisk
+   //zwraca czy jest aktywny 
     bool isActive() const
     {
         return active;
     }
-
+    
     void deactivate()
     {
         active = false;
@@ -367,7 +367,7 @@ public:
         sprite.setTexture(texture);
         sprite.setPosition(375, 525);
     }
-    //obs³uga klawiatury
+    //obsluga klawiatury
     void Keyboard(int speed, const sf::RenderWindow& window)
     {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
@@ -381,7 +381,7 @@ public:
                 sprite.move(speed, 0);
         }
     }
-    //strza³y
+    //strzaly
     void shoot(sf::Clock& clock, sf::Time shootDelay)
     {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && clock.getElapsedTime() > shootDelay)
@@ -392,7 +392,7 @@ public:
             clock.restart();
         }
     }
-    //aktualizacja pocisków 
+    //aktualizacja pociskow 
     void updateBullets()
     {
         for (auto& bullet : bullets)
@@ -591,7 +591,7 @@ private:
     }
 };
 
-//ryoswanie poziomów
+//rysowanie poziomow
 void setupLevel(int level, std::vector<Enemy>& enemies)
 {
     enemies.clear();
@@ -729,7 +729,7 @@ int main() {
 
 
     bool startGame = false;
-    // pêtla g³ówna
+    // petla glowna
     while (window.isOpen()) {
         // Obs³uga menu
         while (!startGame && window.isOpen()) {
@@ -773,11 +773,11 @@ int main() {
         for (unsigned int i = 0; i < enemies.size(); ++i) {
             enemyShootClocks.emplace_back();
         }
-        //Pêtla gry 
+        //Petla gry 
         while (window.isOpen() && !gameOver) {
            
             sf::Event event;
-            // F1 i Pauzy
+            // F1 i Pauza
             while (window.pollEvent(event)) {
                 if (event.type == sf::Event::Closed) {
                     window.close();
@@ -790,7 +790,7 @@ int main() {
                 }
             }
 
-            // Wyœwietlanie pomocy
+            // Wyswietlanie pomocy
             if (isHelpActive) {
                 window.clear();
                 window.draw(helpSprite);
@@ -798,18 +798,18 @@ int main() {
                 continue;
             }
 
-            // Obs³uga pauzy
+            // Obsluga pauzy
             if (pause.isPaused()) {
                 pause.draw(window);
                 continue;
             }
 
-            // Obs³uga postaci
+            // Obsluga postaci
             player.Keyboard(speed, window);
             player.shoot(clock, shootDelay);
             player.updateBullets();
 
-            // Ruch wrogów
+            // Ruch wrogow
             float moveDistance = moveRight ? enemySpeed : -enemySpeed;
             bool changeDirection = false;
 
@@ -824,7 +824,7 @@ int main() {
                 moveRight = !moveRight;
             }
 
-            // Strzelanie wrogów
+            // Strzelanie wrogow
             for (unsigned int i = 0; i < enemies.size(); ++i) {
                 if (enemyShootClocks[i].getElapsedTime() > sf::seconds(enemies[i].getShootInterval())) {
                     enemyBullets.push_back(enemies[i].shoot());
@@ -832,7 +832,7 @@ int main() {
                 }
             }
 
-            // Kolizje pocisków z graczem
+            // Kolizje pociskow z graczem
             for (auto& bullet : enemyBullets) {
                 bullet.move();
                 if (bullet.getBounds().intersects(player.getBounds())) {
@@ -847,12 +847,12 @@ int main() {
 
             if (gameOver) break;
 
-            // Usuwanie nieaktywnych pocisków
+            // Usuwanie nieaktywnych pociskow
             enemyBullets.erase(std::remove_if(enemyBullets.begin(), enemyBullets.end(),
                 [&](const Bullet& bullet) { return bullet.isOffScreen(600) || !bullet.isActive(); }),
                 enemyBullets.end());
 
-            // Kolizje pocisków gracza z wrogami
+            // Kolizje pociskow gracza z wrogami
             for (auto& bullet : player.getBullets()) {
                 if (!bullet.isActive()) continue;
 
@@ -899,13 +899,13 @@ int main() {
             for (auto& bullet : enemyBullets) {
                 bullet.draw(window);
             }
-            // Wyœwietlanie tesktu
+            // Wyswietlanie tesktu
             TextDisplay.setText(score, player.gethp(), level);
             TextDisplay.draw(window);
             window.display();
         }
 
-        // Obs³uga koñca gry
+        // Obsluga konca gry
         bool NewRecord = false;
         if (player.gethp() <= 0 || level > 5) {
             int BestScore = loadBestScore();
